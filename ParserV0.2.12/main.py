@@ -1,4 +1,4 @@
-from flask import *
+from flask import Flask, request, jsonify, send_from_directory
 from ParserSample import DocumentReader
 import os
 from werkzeug.utils import secure_filename
@@ -98,36 +98,23 @@ def parseResume():
 
     parser = ResumeParser(resume_text)
     firstName = ""
-    middleName = ""
     lastName = ""
 
     # Reading the Human names from docToken
-    # candidateName = parser.extract_humanNames()
-    # if candidateName:
-    #     firstName = parser.extract_firstName(candidateName)
-    #     lastName = parser.extract_last_name(candidateName)
-
     candidateName = parser.extract_humanNames()
     if candidateName:
-        candidateName_str = candidateName.text  # Convert Span object to string
+        candidateName_str = candidateName.text
         word_list = candidateName_str.split()
         number_of_words = len(word_list)
-        if number_of_words >= 3:
+
+        if number_of_words == 1:
             firstName = parser.extract_firstName(candidateName)
-            middleName = ""
-            lastName = parser.extract_last_name(candidateName)
-        else:
-            if number_of_words == 1:
-                firstName = parser.extract_firstName(candidateName)
-            else:
-                firstName = parser.extract_firstName(candidateName)
-                lastName = parser.extract_last_name(candidateName)
-
-
+        elif number_of_words >= 2:
+            firstName = parser.extract_firstName(candidateName)
+            middleName = parser.extract_middleName(candidateName)
 
     return jsonify(
         FirstName=f'{firstName}',
-        MiddleNmae =f'{middleName}',
         LastName=f'{lastName}',
         ResumeFileName=f'{f.filename}',
         FullName=f'{candidateName}',
@@ -148,7 +135,7 @@ def parseResume():
         Country=f'{parser.extract_country()}',
         Phone=f'{parser.extract_phone()}',
         City=f'{parser.extract_city()}',
-        PinCode = f'{parser.extract_postalCode()}'
+        PinCode=f'{parser.extract_postalCode()}'
     )
 
 # To parse the resume
@@ -190,3 +177,4 @@ def bulkParse():
 
 if __name__ == '__main__':
     app.run(port='4432')
+

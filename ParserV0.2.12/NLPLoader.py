@@ -116,8 +116,7 @@ class ResumeParser:
 
 
     def extract_postalCode(self):
-        r = re.compile(r'[0-9]{5,6}')
-        return r.findall(self.fromText)
+        return ""
 
 
     def extract_linkedin(self):
